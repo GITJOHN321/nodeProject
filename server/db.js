@@ -6,4 +6,5 @@ export const pool = createPool({
     user: 'root',
     password: '',
     database: 'quiz_db'
+
 })

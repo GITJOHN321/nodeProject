@@ -12,3 +12,10 @@ CREATE TABLE answers(
     question_id INTEGER NOT NULL,
     FOREIGN KEY (question_id) REFERENCES questions(id_question)
 );
+CREATE TABLE users(
+    id_users INTEGER PRIMARY KEY AUTO_INCREMENT,
+    username varchar(40) NOT NULL,
+    email varchar (320) NOT NULL, 
+    password varchar(255) NOT NULL,
+    createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
