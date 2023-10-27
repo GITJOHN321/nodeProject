@@ -22,6 +22,38 @@ export const register = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-export const login = (req, res) => {
-  console.log("login");
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    //res.send("register")
+    const [userFound] = await pool.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    if (!userFound) return res.status(400).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(password, userFound[0].password);
+
+    if (!isMatch) return res.satus(400).json({ message: "Incorrect password" });
+
+    const token = await createAccessToken({ id: userFound[0].id_users });
+
+    res.cookie("token", token);
+    res.json({
+      id: userFound[0].id_users,
+      username: userFound[0].username,
+      email: userFound[0].email,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const logout = (req, res) => {
+  res.cookie(
+    "token",
+    "",
+
+    { expires: new Date(0) }
+  );
+  return res.sendStatus(204);
 };

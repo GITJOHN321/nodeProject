@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(questionRoutes);
 app.use(answerRoutes);
-app.use(authRoutes)
+app.use("/api/",authRoutes)
 app.use(indexRoutes);
 app.listen(PORT);
 console.log(`Server is running on port ${PORT}`);
