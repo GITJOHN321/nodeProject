@@ -3,7 +3,7 @@ import { pool } from "../db.js";
 export const getQuestions = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "SELECT * FROM questions ORDER BY createdAt ASC"
+      "SELECT * FROM questions WHERE id_users = ?  ORDER BY createdAt ASC",[req.user.id]
     );
     res.json(result);
   } catch (error) {
@@ -27,12 +27,14 @@ export const getQuestion = async (req, res) => {
   }
 };
 export const createQuestion = async (req, res) => {
+
   try {
+    const id = req.user.id
     const { title, body } = req.body;
     console.log(req.body);
     const [result] = await pool.query(
-      "INSERT INTO questions(title, body) VALUES (?,?)",
-      [title, body]
+      "INSERT INTO questions(title, body, id_users) VALUES (?,?,?)",
+      [title, body, id]
     );
     res.json(result);
   } catch (error) {

@@ -6,12 +6,13 @@ import {
   updateQuestion,
   deleteQuestion,
 } from "../controllers/question.controllers.js";
+import { authRequired } from "../middlewares/validateToken.js";
 const router = Router();
 
-router.get("/questions", getQuestions);
-router.get("/questions/:id", getQuestion);
-router.put("/questions/:id", updateQuestion);
-router.delete("/questions/:id", deleteQuestion);
-router.post("/question", createQuestion);
+router.get("/questions", authRequired, getQuestions);
+router.get("/questions/:id",authRequired, getQuestion);
+router.put("/questions/:id", authRequired, updateQuestion);
+router.delete("/questions/:id", authRequired, deleteQuestion);
+router.post("/questions", authRequired, createQuestion);
 
 export default router;

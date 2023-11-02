@@ -57,3 +57,15 @@ export const logout = (req, res) => {
   );
   return res.sendStatus(204);
 };
+export const profile = async(req, res) =>{
+  try {
+    const [result] = await pool.query("SELECT * FROM users WHERE id_users = ?",[req.user.id])
+    res.json({
+      id: result[0].id_users,
+      username: result[0].username,
+      email: result[0].email
+    })
+  } catch (error) {
+    return res.satus(400).json({ message: "ERROR" });
+  }
+}
