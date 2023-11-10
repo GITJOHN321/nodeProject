@@ -5,7 +5,7 @@ export const registerSchema = z.object({
   }),
   email: z
     .string({
-      required_error: "Eemail is required",
+      required_error: "Email is required",
     })
     .email({
       required_error: "invalid email",

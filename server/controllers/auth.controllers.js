@@ -19,7 +19,12 @@ export const register = async (req, res) => {
       email,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    if(error.message === `Duplicate entry '${username}' for key 'username'`){
+      error.message = "Username already exist"
+    }else if(error.message === `Duplicate entry '${email}' for key 'email'`){
+      error.message = "Email already exist"
+    }
+    return res.status(500).json([error.message]);
   }
 };
 export const login = async (req, res) => {
