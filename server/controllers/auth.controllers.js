@@ -35,11 +35,11 @@ export const login = async (req, res) => {
       "SELECT * FROM users WHERE email = ?",
       [email]
     );
-    if (!userFound) return res.status(400).json({ message: "User not found" });
+    if (!userFound[0]) return res.status(400).json(["User not found" ]);
 
     const isMatch = await bcrypt.compare(password, userFound[0].password);
 
-    if (!isMatch) return res.satus(400).json({ message: "Incorrect password" });
+    if (!isMatch) return res.status(400).json(["Incorrect password"] );
 
     const token = await createAccessToken({ id: userFound[0].id_users });
 
@@ -50,7 +50,7 @@ export const login = async (req, res) => {
       email: userFound[0].email,
     });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json([error.message]);
   }
 };
 export const logout = (req, res) => {
