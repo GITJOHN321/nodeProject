@@ -1,6 +1,8 @@
 import { pool } from "../db.js";
 import bcrypt from "bcryptjs";
 import { createAccessToken } from "../libs/jwt.js";
+import jwt from "jsonwebtoken";
+import { TOKEN_SECRET } from "../config.js";
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
   try {
@@ -19,10 +21,10 @@ export const register = async (req, res) => {
       email,
     });
   } catch (error) {
-    if(error.message === `Duplicate entry '${username}' for key 'username'`){
-      error.message = "Username already exist"
-    }else if(error.message === `Duplicate entry '${email}' for key 'email'`){
-      error.message = "Email already exist"
+    if (error.message === `Duplicate entry '${username}' for key 'username'`) {
+      error.message = "Username already exist";
+    } else if (error.message === `Duplicate entry '${email}' for key 'email'`) {
+      error.message = "Email already exist";
     }
     return res.status(500).json([error.message]);
   }
@@ -35,11 +37,11 @@ export const login = async (req, res) => {
       "SELECT * FROM users WHERE email = ?",
       [email]
     );
-    if (!userFound[0]) return res.status(400).json(["User not found" ]);
+    if (!userFound[0]) return res.status(400).json(["User not found"]);
 
     const isMatch = await bcrypt.compare(password, userFound[0].password);
 
-    if (!isMatch) return res.status(400).json(["Incorrect password"] );
+    if (!isMatch) return res.status(400).json(["Incorrect password"]);
 
     const token = await createAccessToken({ id: userFound[0].id_users });
 
@@ -62,15 +64,39 @@ export const logout = (req, res) => {
   );
   return res.sendStatus(204);
 };
-export const profile = async(req, res) =>{
+export const profile = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT * FROM users WHERE id_users = ?",[req.user.id])
+    const [result] = await pool.query(
+      "SELECT * FROM users WHERE id_users = ?",
+      [req.user.id]
+    );
     res.json({
       id: result[0].id_users,
       username: result[0].username,
-      email: result[0].email
-    })
+      email: result[0].email,
+    });
   } catch (error) {
     return res.satus(400).json({ message: "ERROR" });
   }
-}
+};
+
+export const verifyToken = async (req, res) => {
+  const { token } = req.cookies;
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  jwt.verify(token, TOKEN_SECRET, async (err, user) => {
+    if (err) return res.status(401).json({ message: "Unauthorized" });
+
+    const [userFound] = await pool.query(
+      "SELECT * FROM users WHERE id_users = ?",
+      [user.id]
+    );
+    if (!userFound[0]) return res.status(401).json(["Unauthorized"]);
+
+    return res.json({
+      id: userFound[0].id_users,
+      username: userFound[0].username,
+      email: userFound[0].email,
+    });
+  });
+};

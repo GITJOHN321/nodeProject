@@ -1,22 +1,35 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
-import { AuthProvider } from "./context/AuthContext";
+import QuestionPage from "./pages/QuestionPage";
+import QuestionFormPage from "./pages/QuestionFormPage";
+import ProfilePage from "./pages/ProfilePage";
+import HomePage from "./pages/HomePage";
+import ProtectedRoute from "./ProtectedRoute";
+import { QuestionProvider } from "./context/QuestionContext";
+import Navbar from "./components/navbar";
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<h1> Home Page</h1>} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/questions" element={<h1> List my Questions</h1>} />
-          <Route path="/add-question" element={<h1> Create Question</h1>} />
-          <Route path="/questions/:id" element={<h1> See Question</h1>} />
-          <Route path="/profile" element={<h1> Profile User</h1>} />
-        </Routes>
-      </BrowserRouter>
+      <QuestionProvider>
+        <BrowserRouter>
+          <Navbar></Navbar>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/questions" element={<QuestionPage />} />
+              <Route path="/questions/new" element={<QuestionFormPage />} />
+              <Route path="/questions/:id" element={<QuestionFormPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </QuestionProvider>
     </AuthProvider>
   );
 }
