@@ -2,6 +2,9 @@ import { createContext, useContext, useState } from "react";
 import {
   createQuestionsRequest,
   getQuestionsRequest,
+  deleteQuestionsRequest,
+  getQuestionRequest,
+  putQuestionsRequest
 } from "../api/question.js";
 
 const QuestionContext = createContext();
@@ -34,10 +37,36 @@ export function QuestionProvider({ children }) {
       console.error(error);
     }
   };
+  const deleteQuestion = async (id) => {
+    try {
+      const res = await deleteQuestionsRequest(id);
+      if (res.status == 204)
+        setQuestions(
+          Questions.filter((question) => question.id_question != id)
+        );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const getQuestion = async (id) => {
+    try {
+      const res = await getQuestionRequest(id);
+      return res.data
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const updateQuestion = async (id,question) => {
+    try {
+      await putQuestionsRequest(id,question)
 
+    } catch (error) {
+      console.error(error)
+    }
+  }
   return (
     <QuestionContext.Provider
-      value={{ Questions, createQuestion, getQuestions }}
+      value={{ Questions, createQuestion, getQuestions, deleteQuestion,getQuestion, updateQuestion}}
     >
       {children}
     </QuestionContext.Provider>

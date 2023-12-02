@@ -15,19 +15,21 @@ function App() {
     <AuthProvider>
       <QuestionProvider>
         <BrowserRouter>
-          <Navbar></Navbar>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+          <main className="container mx-auto px-10">
+            <Navbar></Navbar>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/questions" element={<QuestionPage />} />
-              <Route path="/questions/new" element={<QuestionFormPage />} />
-              <Route path="/questions/:id" element={<QuestionFormPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-            </Route>
-          </Routes>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/questions" element={<QuestionPage />} />
+                <Route path="/questions/new" element={<QuestionFormPage />} />
+                <Route path="/questions/:id" element={<QuestionFormPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+              </Route>
+            </Routes>
+          </main>
         </BrowserRouter>
       </QuestionProvider>
     </AuthProvider>
