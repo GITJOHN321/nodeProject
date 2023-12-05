@@ -33,6 +33,7 @@ function QuestionFormPage() {
       <div className="bg-zinc-800 max-w-md w-full p-10 rounded-md">
         <h1 className="my-2">New Question</h1>
         <form onSubmit={onSubmit}>
+          <label htmlFor="title">Title</label>
           <input
             placeholder="title"
             type="text"
@@ -40,6 +41,7 @@ function QuestionFormPage() {
             className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
             autoFocus
           />
+          <label htmlFor="body">Description</label>
           <textarea
             placeholder="Description"
             rows="3"
