@@ -8,13 +8,18 @@ import {
 } from "../controllers/answer.controllers.js";
 import { authRequired } from "../middlewares/validateToken.js";
 import { validateSchema } from "../middlewares/validator.middleware.js";
-import { createQuestionSchema } from "../schemas/question.schema.js";
+import { createAnswerSchema } from "../schemas/answer.schema.js";
 const router = Router();
 
-router.get("/answers", getAnswers);
-router.get("/answers/:id", getAnswer);
-router.post("/answer", postAnswer);
-router.put("/answers/:id", updateAnswer);
-router.delete("/answers/:id", deleteAnswer);
+router.get("/answers", authRequired, getAnswers);
+router.get("/answers/:id", authRequired, getAnswer);
+router.put("/answers/:id", authRequired, updateAnswer);
+router.delete("/answers/:id", authRequired, deleteAnswer);
+router.post(
+  "/answers",
+  authRequired,
+  validateSchema(createAnswerSchema),
+  postAnswer
+);
 
 export default router;

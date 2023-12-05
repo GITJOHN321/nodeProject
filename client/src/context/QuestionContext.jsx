@@ -6,7 +6,7 @@ import {
   getQuestionRequest,
   putQuestionsRequest
 } from "../api/question.js";
-
+import { createAnswersRequest } from "../api/answer.js";
 const QuestionContext = createContext();
 
 export const useQuestions = () => {
@@ -23,6 +23,7 @@ export function QuestionProvider({ children }) {
   const createQuestion = async (question) => {
     try {
       const res = await createQuestionsRequest(question);
+      return res.data
     } catch (error) {
       console.error(error);
     }
@@ -64,9 +65,18 @@ export function QuestionProvider({ children }) {
       console.error(error)
     }
   }
+  const createAnswer = async(answer, id) => {
+    try {
+      const reAnswer = {body: answer, question_id: id.toString()}
+      const res = await createAnswersRequest(reAnswer)
+      //console.log(reAnswer)
+    } catch (error) {
+      console.error(error)
+    }
+  }
   return (
     <QuestionContext.Provider
-      value={{ Questions, createQuestion, getQuestions, deleteQuestion,getQuestion, updateQuestion}}
+      value={{ Questions, createQuestion, getQuestions, deleteQuestion,getQuestion, updateQuestion, createAnswer}}
     >
       {children}
     </QuestionContext.Provider>
