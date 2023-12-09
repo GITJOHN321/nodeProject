@@ -2,7 +2,8 @@ import { pool } from "../db.js";
 export const getAnswers = async (req, res) => {
   // res.send("get answers");
   try {
-    const [result] = await pool.query("SELECT * FROM answers");
+    const { question_id } = req.body;
+    const [result] = await pool.query("SELECT * FROM answers WHERE question_id = ?",[question_id]);
     res.json(result);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -36,9 +37,10 @@ export const postAnswer = async (req, res) => {
 };
 export const updateAnswer = async (req, res) => {
   try {
+
     const [result] = await pool.query(
-      "UPDATE answers SET ? WHERE id_answer = ?",
-      [req.body,req.params.id]
+      "UPDATE answers SET ? WHERE  id_answer = ? ",
+      [req.body, req.params.id]
     );
     res.json(result)
   } catch (error) {

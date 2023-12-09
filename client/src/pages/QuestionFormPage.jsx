@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import { useQuestions } from "../context/QuestionContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useQuill } from "react-quilljs";
+import "quill/dist/quill.snow.css";
+import toolbar from "../assets/toolbar";
 
 function QuestionFormPage() {
   const { register, handleSubmit, setValue } = useForm();
@@ -11,12 +14,17 @@ function QuestionFormPage() {
     getQuestion,
     updateQuestion,
     Questions,
+    updateAnswer,
+    deleteAnswer,
   } = useQuestions();
   const navigate = useNavigate();
   const params = useParams();
 
   //dinamic InputFields--------------------------------
   const [inputFields, setInputFields] = useState([{ body: "" }]);
+  const [answer_data, setAnswers] = useState([]);
+  const [listAnswers, setListAnswers] = useState([]);
+
   const handleFormChange = (index, event) => {
     let data = [...inputFields];
     data[index][event.target.name] = event.target.value;
@@ -30,8 +38,13 @@ function QuestionFormPage() {
   const removeFields = (index) => {
     if (index > 0) {
       let data = [...inputFields];
+      let data2 = [...answer_data];
       data.splice(index, 1);
+      data2.splice(index, 1);
+      setAnswers(data2);
       setInputFields(data);
+      console.log(data2);
+      console.log(listAnswers);
     }
   };
   //----------------------------------------------------
@@ -39,28 +52,58 @@ function QuestionFormPage() {
   useEffect(() => {
     async function loadQuestion() {
       if (params.id) {
+        let list = [];
         const question = await getQuestion(params.id);
-        console.log(question);
+        setAnswers(question.answers);
+        setListAnswers(question.answers);
         setValue("title", question.title);
         setValue("body", question.body);
+        question.answers.map((answer) => {
+          list.push({ body: answer.body });
+        });
+        setInputFields(list);
       }
     }
+
     loadQuestion();
   }, []);
 
   const onSubmit = handleSubmit(async (data) => {
     if (params.id) {
-      updateQuestion(params.id, data);
+    
+     //function update question and answers
+      async function updateQuestionAndAnswers() {
+        updateQuestion(params.id, data);
+
+        const list = listAnswers.filter(
+          (elemento) => !answer_data.includes(elemento)
+        );
+        list.map((e) => {
+          deleteAnswer(e.id_answer)
+          console.log("id: " + e.id_answer + "eliminado: " + e.body);
+        });
+
+        for (let i = 0; i < inputFields.length; i++) {
+          if (
+            i <= answer_data.length - 1 &&
+            answer_data[i].body != inputFields[i].body
+          ) {
+            updateAnswer(answer_data[i].id_answer, inputFields[i].body);
+            console.log(answer_data[i].id_answer + ": " + inputFields[i].body);
+          } else if (i > answer_data.length - 1) {
+            createAnswer(inputFields[i].body, params.id);
+          }
+        }
+      }
+      updateQuestionAndAnswers();
     } else {
       const idQuestion = await createQuestion(data);
-
-      //console.log(idQuestion.insertId);
 
       inputFields.map(async (input) => {
         const res = await createAnswer(input.body, idQuestion.insertId);
       });
     }
-    navigate("/questions");
+    //navigate("/questions");
   });
   return (
     <div className="flex h-[calc(100vh-100px)] items-center justify-center">

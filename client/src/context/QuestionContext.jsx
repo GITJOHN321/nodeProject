@@ -6,7 +6,7 @@ import {
   getQuestionRequest,
   putQuestionsRequest
 } from "../api/question.js";
-import { createAnswersRequest } from "../api/answer.js";
+import { createAnswersRequest, putAnswersRequest, deleteAnswersRequest } from "../api/answer.js";
 const QuestionContext = createContext();
 
 export const useQuestions = () => {
@@ -74,9 +74,24 @@ export function QuestionProvider({ children }) {
       console.error(error)
     }
   }
+  const updateAnswer = async(id, answer) =>{
+    try {
+      await putAnswersRequest(id,{body: answer})
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  const deleteAnswer = async(id) =>{
+    try {
+      await deleteAnswersRequest(id)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+  
   return (
     <QuestionContext.Provider
-      value={{ Questions, createQuestion, getQuestions, deleteQuestion,getQuestion, updateQuestion, createAnswer}}
+      value={{ Questions, createQuestion, getQuestions, deleteQuestion,getQuestion, updateQuestion, createAnswer, updateAnswer, deleteAnswer}}
     >
       {children}
     </QuestionContext.Provider>
