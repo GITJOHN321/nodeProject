@@ -23,7 +23,7 @@ function QuestionCard({ question }) {
         </div>
       </header>
 
-      <p className="text-slate-300">{question.body}</p>
+      <p className="text-slate-300" dangerouslySetInnerHTML={{__html:question.body}}></p>
       <p>{new Date(question.createdAt).toLocaleDateString()}</p>
     </div>
   );

@@ -2,8 +2,13 @@ import { useForm } from "react-hook-form";
 import { useQuestions } from "../context/QuestionContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useQuill } from "react-quilljs";
-import "quill/dist/quill.snow.css";
+//import { useQuill } from "react-quilljs";
+//import "quill/dist/quill.snow.css";
+
+//quill v2.0
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 import toolbar from "../assets/toolbar";
 
 function QuestionFormPage() {
@@ -20,10 +25,13 @@ function QuestionFormPage() {
   const navigate = useNavigate();
   const params = useParams();
 
+
+
   //dinamic InputFields--------------------------------
   const [inputFields, setInputFields] = useState([{ body: "" }]);
   const [answer_data, setAnswers] = useState([]);
   const [listAnswers, setListAnswers] = useState([]);
+  const [description, setDescription] = useState('');
 
   const handleFormChange = (index, event) => {
     let data = [...inputFields];
@@ -53,15 +61,17 @@ function QuestionFormPage() {
     async function loadQuestion() {
       if (params.id) {
         let list = [];
+
         const question = await getQuestion(params.id);
-        setAnswers(question.answers);
-        setListAnswers(question.answers);
+
         setValue("title", question.title);
-        setValue("body", question.body);
+        setDescription(question.body)
         question.answers.map((answer) => {
           list.push({ body: answer.body });
         });
         setInputFields(list);
+        setAnswers(question.answers);
+        setListAnswers(question.answers);
       }
     }
 
@@ -70,16 +80,19 @@ function QuestionFormPage() {
 
   const onSubmit = handleSubmit(async (data) => {
     if (params.id) {
-    
-     //function update question and answers
+      //function update question and answers
       async function updateQuestionAndAnswers() {
-        updateQuestion(params.id, data);
+        const question_data = {
+          title: data.title,
+          body: description,
+        };
+        updateQuestion(params.id, question_data);
 
         const list = listAnswers.filter(
           (elemento) => !answer_data.includes(elemento)
         );
         list.map((e) => {
-          deleteAnswer(e.id_answer)
+          deleteAnswer(e.id_answer);
           console.log("id: " + e.id_answer + "eliminado: " + e.body);
         });
 
@@ -97,13 +110,26 @@ function QuestionFormPage() {
       }
       updateQuestionAndAnswers();
     } else {
-      const idQuestion = await createQuestion(data);
+      const regex = /^\s*$/;
+      
+      if(regex.test(description)){
+        console.log(false)
+        return
+      }else{
+        const question_data = {
+          title: data.title,
+          body: description,
+        };
+        const idQuestion = await createQuestion(question_data);
 
-      inputFields.map(async (input) => {
-        const res = await createAnswer(input.body, idQuestion.insertId);
-      });
+        inputFields.map(async (input) => {
+          const res = await createAnswer(input.body, idQuestion.insertId);
+        });
+      }
+        
+      
     }
-    //navigate("/questions");
+    navigate("/questions");
   });
   return (
     <div className="flex h-[calc(100vh-100px)] items-center justify-center">
@@ -117,7 +143,9 @@ function QuestionFormPage() {
             {...register("title")}
             className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
             autoFocus
+            required
           />
+          {/*
           <label htmlFor="body">Description</label>
           <textarea
             placeholder="Description"
@@ -125,6 +153,23 @@ function QuestionFormPage() {
             {...register("body")}
             className="w-full bg-zinc-700 text-white px-4 py-2 rounded-md my-2"
           ></textarea>
+        */}
+
+          <label htmlFor="body">Description</label>
+          <ReactQuill
+          theme="snow"
+          name = "body"
+          value={description}
+          onChange={setDescription}
+          placeholder="Write a Description please..."
+          ></ReactQuill>
+          {/*
+          <div name="body" className="editor">
+            <div ref={quillRef}></div>
+          </div>
+          */}
+          
+
           <label>Answers</label>
           {inputFields.map((inputField, index) => (
             <div key={index} className="relative w-full">
@@ -134,6 +179,7 @@ function QuestionFormPage() {
                 name="body"
                 value={inputField.body}
                 onChange={(event) => handleFormChange(index, event)}
+                required
               />
               <button
                 onClick={(e) => {
