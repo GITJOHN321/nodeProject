@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 function RegisterPage() {
   const {
-    register,
+    register, 
     handleSubmit,
     formState: { errors },
   } = useForm();
